@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Presentation System - Settings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="logo-text">
+                    <h2>AI Presentation</h2>
+                    <span>System</span>
+                </div>
+            </div>
+
+            <ul class="menu">
+                <a href="/dashboard">
+                    <li>
+                        <i class="fa-solid fa-house"></i>
+                        <span>Dashboard</span>
+                    </li>
+                </a>
+                <a href="/gesture">
+                    <li>
+                        <i class="fa-solid fa-hand"></i>
+                        <span>Gesture Module</span>
+                    </li>
+                </a>
+                <a href="/presentation">
+                    <li>
+                        <i class="fa-solid fa-display"></i>
+                        <span>Presentation</span>
+                    </li>
+                </a>
+                <a href="/history">
+                    <li>
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>History</span>
+                    </li>
+                </a>
+                <a href="/settings">
+                    <li class="active">
+                        <i class="fa-solid fa-gear"></i>
+                        <span>Settings</span>
+                    </li>
+                </a>
+            </ul>
+
+            <div class="sidebar-presenter">
+                <div class="presenter-avatar">
+                    {{ settings.presenter_name[0] if settings.presenter_name else 'P' }}
+                </div>
+                <div class="presenter-info">
+                    <div class="presenter-name" id="sidebarPresenterName">{{ settings.presenter_name }}</div>
+                    <div class="presenter-status">Authorized Presenter</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-wrapper">
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>System Settings & Configuration</h1>
+                    <p>Customize computer vision parameters, biometric profiles, and presentation preferences</p>
+                </div>
+                <div class="header-right">
+                    <button class="btn btn-secondary" id="resetDefaultsBtn">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Defaults
+                    </button>
+                    <button class="btn btn-primary" id="saveSettingsBtn">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Settings
+                    </button>
+                </div>
+            </header>
+
+            <!-- Settings 2-Column Grid -->
+            <div class="settings-grid">
+
+                <!-- Card 1: Camera & Vision Settings -->
+                <div class="card settings-card">
+                    <h2><i class="fa-solid fa-camera"></i> Camera & Vision Hardware</h2>
+                    <div class="settings-group">
+                        <div class="form-field">
+                            <label for="cameraSelect">Active Camera Device</label>
+                            <select id="cameraSelect" class="form-select">
+                                <option value="0" {% if settings.camera_index==0 %}selected{% endif %}>Camera 0 (Default
+                                    Webcam)</option>
+                                <option value="1" {% if settings.camera_index==1 %}selected{% endif %}>Camera 1
+                                    (External USB / OBS)</option>
+                                <option value="2" {% if settings.camera_index==2 %}selected{% endif %}>Camera 2
+                                    (Secondary)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="sensitivitySelect">Gesture Detection Sensitivity</label>
+                            <select id="sensitivitySelect" class="form-select">
+                                <option value="High" {% if settings.sensitivity=='High' %}selected{% endif %}>High
+                                    (Quick response, sensitive)</option>
+                                <option value="Medium" {% if settings.sensitivity=='Medium' %}selected{% endif %}>Medium
+                                    (Balanced - Recommended)</option>
+                                <option value="Low" {% if settings.sensitivity=='Low' %}selected{% endif %}>Low
+                                    (Requires firm hand gestures)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="cooldownSlider">Gesture Cooldown Interval (Debounce)</label>
+                            <div class="range-slider-wrapper">
+                                <input type="range" id="cooldownSlider" class="range-slider" min="0.5" max="3.0"
+                                    step="0.1" value="{{ settings.cooldown }}">
+                                <span class="slider-val-badge" id="cooldownValDisplay">{{ settings.cooldown }}s</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Security & Presentation Settings -->
+                <div class="card settings-card">
+                    <h2><i class="fa-solid fa-user-shield"></i> Biometric Profile & Laser Pointer</h2>
+                    <div class="settings-group">
+                        <div class="form-field">
+                            <label for="presenterNameInput">Authorized Presenter Name</label>
+                            <input type="text" id="presenterNameInput" class="form-input"
+                                value="{{ settings.presenter_name }}" placeholder="Enter presenter name...">
+                        </div>
+
+                        <!-- Biometric Security Gate Mode -->
+                        <div class="form-field">
+                            <label for="enforceFaceAuthSelect">Biometric Security Gate Mode</label>
+                            <select id="enforceFaceAuthSelect" class="form-select">
+                                <option value="false" {% if not settings.enforce_face_auth %}selected{% endif %}>Flexible Mode (Recommended - Gestures Always Active & Fast)</option>
+                                <option value="true" {% if settings.enforce_face_auth %}selected{% endif %}>Strict Mode (Gestures Locked to Verified Face Only)</option>
+                            </select>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                                <i class="fa-solid fa-circle-info" style="color: var(--secondary);"></i> Flexible mode allows smooth, instant gestures without facial blockage or frame drop.
+                            </p>
+                        </div>
+
+                        <!-- Biometric Face Enrollment Section -->
+                        <div class="form-field">
+                            <label>Biometric Face Profile</label>
+                            <div style="background: rgba(14, 18, 38, 0.6); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+                                <div style="display: flex; align-items: center; gap: 14px;">
+                                    <div style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--border-glow); overflow: hidden; background: #1E293B; display: flex; align-items: center; justify-content: center;">
+                                        <img id="settingsFaceThumb" src="/static/registered_face.jpg" alt="Enrolled Face"
+                                             style="width: 100%; height: 100%; object-fit: cover; display: none;"
+                                             onerror="this.style.display='none'; document.getElementById('settingsFaceIcon').style.display='block';">
+                                        <i class="fa-solid fa-user-tie" id="settingsFaceIcon" style="font-size: 20px; color: var(--text-dim);"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 14px; color: #fff;" id="settingsFaceStatusTitle">Checking profile...</div>
+                                        <div style="font-size: 12px; color: var(--text-muted);" id="settingsFaceStatusSub">Gestures only respond to registered face</div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <button type="button" class="btn-sm-register" id="settingsRegisterFaceBtn">
+                                        <i class="fa-solid fa-camera"></i> Register Face
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="settingsResetFaceBtn" style="padding: 8px 12px; font-size: 12px;" title="Reset enrolled face">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-field">
+                            <label>Optical Laser Pointer Color</label>
+                            <div class="color-picker-row">
+                                <div class="color-option {% if settings.laser_color == '#FF0055' %}active{% endif %}"
+                                    style="background: #FF0055;" data-color="#FF0055" title="Neon Crimson"></div>
+                                <div class="color-option {% if settings.laser_color == '#00FF88' %}active{% endif %}"
+                                    style="background: #00FF88;" data-color="#00FF88" title="Neon Emerald"></div>
+                                <div class="color-option {% if settings.laser_color == '#38BDF8' %}active{% endif %}"
+                                    style="background: #38BDF8;" data-color="#38BDF8" title="Cyan Blue"></div>
+                                <div class="color-option {% if settings.laser_color == '#FBBF24' %}active{% endif %}"
+                                    style="background: #FBBF24;" data-color="#FBBF24" title="Amber Gold"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-field">
+                            <label>Theme Accent</label>
+                            <input type="text" class="form-input" value="Cyber Midnight (Dark Purple / Cyan)" disabled
+                                style="opacity: 0.7; cursor: not-allowed;">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Biometric Face Enrollment Modal -->
+            <div class="modal-overlay" id="faceRegisterModal">
+                <div class="modal-box">
+                    <div class="modal-header">
+                        <h3><i class="fa-solid fa-user-shield" style="color: var(--secondary);"></i> Biometric Face Registration</h3>
+                        <button type="button" class="modal-close-btn" id="closeFaceModalBtn">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
+                            Position your face directly in the camera frame in good lighting. The system will enroll your facial profile so that <strong>only your hand gestures</strong> can control the presentation.
+                        </p>
+                        <div class="form-field" style="margin-bottom: 0;">
+                            <label for="modalPresenterNameInput">Presenter Name</label>
+                            <input type="text" id="modalPresenterNameInput" class="form-input"
+                                   value="{{ settings.presenter_name }}" placeholder="Enter presenter name...">
+                        </div>
+                        <div class="modal-cam-preview">
+                            <img id="modalCamFeed" src="" data-src="{{ url_for('auth_feed') }}" alt="Camera Registration Preview">
+                        </div>
+                        <div class="scan-progress-wrapper" id="scanProgressWrapper">
+                            <div class="scan-progress-bar">
+                                <div class="scan-progress-fill" id="scanProgressFill"></div>
+                            </div>
+                            <div class="scan-status-msg" id="scanStatusMsg">
+                                <i class="fa-solid fa-spinner fa-spin"></i> <span>Scanning face samples...</span>
+                            </div>
+                        </div>
+                        <button type="button" id="startModalRegisterBtn" class="btn btn-primary" style="width: 100%; padding: 14px;">
+                            <i class="fa-solid fa-camera-retro"></i> Capture & Register Face Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <footer>
+                © 2026 AI-Based Authorized Gesture Controlled Presentation System. All Rights Reserved.
+            </footer>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+{
+  "camera_index": 0,
+  "sensitivity": "High",
+  "cooldown": 0.6,
+  "presenter_name": "daruniga",
+  "laser_color": "#FF0055",
+  "theme": "dark",
+  "enforce_face_auth": false,
+  "face_registered": false
+}

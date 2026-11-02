@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Presentation System - Gesture Recognition Module</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/gesture.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="logo-text">
+                    <h2>AI Presentation</h2>
+                    <span>System</span>
+                </div>
+            </div>
+
+            <ul class="menu">
+                <a href="/dashboard">
+                    <li>
+                        <i class="fa-solid fa-house"></i>
+                        <span>Dashboard</span>
+                    </li>
+                </a>
+                <a href="/gesture">
+                    <li class="active">
+                        <i class="fa-solid fa-hand"></i>
+                        <span>Gesture Module</span>
+                    </li>
+                </a>
+                <a href="/presentation">
+                    <li>
+                        <i class="fa-solid fa-display"></i>
+                        <span>Presentation</span>
+                    </li>
+                </a>
+                <a href="/history">
+                    <li>
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>History</span>
+                    </li>
+                </a>
+                <a href="/settings">
+                    <li>
+                        <i class="fa-solid fa-gear"></i>
+                        <span>Settings</span>
+                    </li>
+                </a>
+            </ul>
+
+            <div class="sidebar-presenter">
+                <div class="presenter-avatar">
+                    {{ settings.presenter_name[0] if settings.presenter_name else 'P' }}
+                </div>
+                <div class="presenter-info">
+                    <div class="presenter-name">{{ settings.presenter_name }}</div>
+                    <div class="presenter-status">Authorized Presenter</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-wrapper">
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>Gesture Recognition Module</h1>
+                    <p>Real-time 21 3D Hand Landmark Tracking & Neural Gesture Classification Engine</p>
+                </div>
+                <div class="header-right">
+                    <a href="/presentation" class="btn btn-primary">
+                        <i class="fa-solid fa-play"></i> Launch Presentation
+                    </a>
+                </div>
+            </header>
+
+            <!-- Studio Grid -->
+            <div class="gesture-studio-grid">
+                <!-- Left: Video Feed with Landmarks & HUD -->
+                <div class="card gesture-feed-card">
+                    <div class="gesture-feed-header">
+                        <h2 style="font-size: 17px; font-weight: 600; color: #fff;">MediaPipe Live Hand Stream</h2>
+                        <span class="badge-live" id="streamStatusBadge">
+                            <span class="pulse-dot"></span> Tracking Active
+                        </span>
+                    </div>
+                    <div class="gesture-feed-container">
+                        <img id="gestureVideoFeed" src="{{ url_for('gesture_feed') }}" alt="Gesture Recognition Stream">
+
+                        <!-- Dynamic HUD overlay at bottom of stream -->
+                        <div class="live-gesture-status-bar">
+                            <div class="status-left">
+                                <div class="status-indicator-ring" id="gestureIndicator"></div>
+                                <div class="status-texts">
+                                    <h4 id="detectedGestureText">No Hand Detected</h4>
+                                    <p id="detectedActionText">Show hand gestures to trigger presentation actions</p>
+                                </div>
+                            </div>
+                            <div class="cooldown-gauge-wrapper">
+                                <span id="cooldownLabel">Cooldown: Ready</span>
+                                <div class="cooldown-progress-bg">
+                                    <div class="cooldown-progress-fill" id="cooldownBar"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Interactive Gestures Matrix List -->
+                <div class="card gesture-cards-panel">
+                    <h2>Supported Gesture Classification</h2>
+                    <div class="gesture-matrix-list">
+                        <div class="gesture-matrix-card" id="card-Thumb-Up">
+                            <div class="emoji">👍</div>
+                            <div class="info">
+                                <div class="name">Thumb Up</div>
+                                <div class="action-label">Next Slide</div>
+                            </div>
+                            <span class="tag">Discrete</span>
+                        </div>
+
+                        <div class="gesture-matrix-card" id="card-Thumb-Down">
+                            <div class="emoji">👎</div>
+                            <div class="info">
+                                <div class="name">Thumb Down</div>
+                                <div class="action-label">Previous Slide</div>
+                            </div>
+                            <span class="tag">Discrete</span>
+                        </div>
+
+                        <div class="gesture-matrix-card" id="card-Open-Palm">
+                            <div class="emoji">✋</div>
+                            <div class="info">
+                                <div class="name">Open Palm</div>
+                                <div class="action-label">Start Presentation</div>
+                            </div>
+                            <span class="tag">Discrete</span>
+                        </div>
+
+                        <div class="gesture-matrix-card" id="card-Closed-Fist">
+                            <div class="emoji">✊</div>
+                            <div class="info">
+                                <div class="name">Closed Fist</div>
+                                <div class="action-label">Pause / Hold Presentation</div>
+                            </div>
+                            <span class="tag">Discrete</span>
+                        </div>
+
+                        <div class="gesture-matrix-card" id="card-Index-Finger">
+                            <div class="emoji">☝️</div>
+                            <div class="info">
+                                <div class="name">Index Finger Up</div>
+                                <div class="action-label">Optical Laser Pointer Mode</div>
+                            </div>
+                            <span class="tag">Continuous</span>
+                        </div>
+
+                        <div class="gesture-matrix-card" id="card-Two-Fingers">
+                            <div class="emoji">✌️</div>
+                            <div class="info">
+                                <div class="name">Two Fingers (Victory)</div>
+                                <div class="action-label">Zoom In Deck (+0.25x)</div>
+                            </div>
+                            <span class="tag">Discrete</span>
+                        </div>
+
+                        <div class="gesture-matrix-card" id="card-Three-Fingers">
+                            <div class="emoji">3️⃣</div>
+                            <div class="info">
+                                <div class="name">Three Fingers</div>
+                                <div class="action-label">Zoom Out Deck (-0.25x)</div>
+                            </div>
+                            <span class="tag">Discrete</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metrics Row -->
+            <div class="gesture-metrics-grid">
+                <div class="metric-card">
+                    <div class="val" id="metricConfidence">98%</div>
+                    <div class="lbl">Confidence Score</div>
+                </div>
+                <div class="metric-card">
+                    <div class="val" id="metricLandmarks">21</div>
+                    <div class="lbl">Landmarks Tracked</div>
+                </div>
+                <div class="metric-card">
+                    <div class="val" id="metricLatency">32 ms</div>
+                    <div class="lbl">Inference Latency</div>
+                </div>
+                <div class="metric-card">
+                    <div class="val" id="metricTriggers">14</div>
+                    <div class="lbl">Gestures Dispatched</div>
+                </div>
+            </div>
+
+            <footer>
+                © 2026 AI-Based Authorized Gesture Controlled Presentation System. All Rights Reserved.
+            </footer>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/gesture.js') }}"></script>
+</body>
+
+</html>

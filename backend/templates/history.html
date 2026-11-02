@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Presentation System - Activity History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="logo-text">
+                    <h2>AI Presentation</h2>
+                    <span>System</span>
+                </div>
+            </div>
+
+            <ul class="menu">
+                <a href="/dashboard">
+                    <li>
+                        <i class="fa-solid fa-house"></i>
+                        <span>Dashboard</span>
+                    </li>
+                </a>
+                <a href="/gesture">
+                    <li>
+                        <i class="fa-solid fa-hand"></i>
+                        <span>Gesture Module</span>
+                    </li>
+                </a>
+                <a href="/presentation">
+                    <li>
+                        <i class="fa-solid fa-display"></i>
+                        <span>Presentation</span>
+                    </li>
+                </a>
+                <a href="/history">
+                    <li class="active">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>History</span>
+                    </li>
+                </a>
+                <a href="/settings">
+                    <li>
+                        <i class="fa-solid fa-gear"></i>
+                        <span>Settings</span>
+                    </li>
+                </a>
+            </ul>
+
+            <div class="sidebar-presenter">
+                <div class="presenter-avatar">
+                    {{ settings.presenter_name[0] if settings.presenter_name else 'P' }}
+                </div>
+                <div class="presenter-info">
+                    <div class="presenter-name">{{ settings.presenter_name }}</div>
+                    <div class="presenter-status">Authorized Presenter</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-wrapper">
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>User Activity & Gesture History</h1>
+                    <p>Comprehensive audit log of facial authorizations, gesture inputs, and presentation events</p>
+                </div>
+                <div class="header-right">
+                    <button class="btn btn-secondary" id="exportCsvBtn">
+                        <i class="fa-solid fa-file-export"></i> Export CSV
+                    </button>
+                    <button class="btn btn-danger" id="clearHistoryBtn">
+                        <i class="fa-solid fa-trash-can"></i> Clear History
+                    </button>
+                </div>
+            </header>
+
+            <!-- Search and Filter Controls -->
+            <div class="history-controls-bar">
+                <div class="history-search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="historySearchInput" placeholder="Filter by gesture, action, or date...">
+                </div>
+                <div class="history-actions-group">
+                    <button class="btn btn-secondary" id="refreshHistoryBtn" style="padding: 10px 18px;">
+                        <i class="fa-solid fa-arrows-rotate"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- History Data Table Container -->
+            <div class="history-table-container">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">ID</th>
+                            <th style="width: 180px;">Timestamp</th>
+                            <th style="width: 200px;">Detected Gesture</th>
+                            <th>Action / Event</th>
+                            <th style="width: 130px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        {% for item in history %}
+                        <tr>
+                            <td>#{{ item.id }}</td>
+                            <td>{{ item.timestamp }}</td>
+                            <td>
+                                <div class="gesture-cell">
+                                    <i class="fa-solid {{ item.icon or 'fa-bolt' }}"></i>
+                                    <span>{{ item.gesture }}</span>
+                                </div>
+                            </td>
+                            <td>{{ item.action }}</td>
+                            <td>
+                                <span class="badge-status {{ item.status.lower() }}">{{ item.status }}</span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-history-state">
+                                    <i class="fa-solid fa-inbox"></i>
+                                    <h3>No activity logged yet</h3>
+                                    <p>Perform gestures or run presentations to populate history.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <footer>
+                © 2026 AI-Based Authorized Gesture Controlled Presentation System. All Rights Reserved.
+            </footer>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/history.js') }}"></script>
+</body>
+
+</html>

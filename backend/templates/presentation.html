@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Presentation System - Live Presentation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/presentation.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="logo-text">
+                    <h2>AI Presentation</h2>
+                    <span>System</span>
+                </div>
+            </div>
+
+            <ul class="menu">
+                <a href="/dashboard">
+                    <li>
+                        <i class="fa-solid fa-house"></i>
+                        <span>Dashboard</span>
+                    </li>
+                </a>
+                <a href="/gesture">
+                    <li>
+                        <i class="fa-solid fa-hand"></i>
+                        <span>Gesture Module</span>
+                    </li>
+                </a>
+                <a href="/presentation">
+                    <li class="active">
+                        <i class="fa-solid fa-display"></i>
+                        <span>Presentation</span>
+                    </li>
+                </a>
+                <a href="/history">
+                    <li>
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>History</span>
+                    </li>
+                </a>
+                <a href="/settings">
+                    <li>
+                        <i class="fa-solid fa-gear"></i>
+                        <span>Settings</span>
+                    </li>
+                </a>
+            </ul>
+
+            <div class="sidebar-presenter">
+                <div class="presenter-avatar">
+                    {{ settings.presenter_name[0] if settings.presenter_name else 'P' }}
+                </div>
+                <div class="presenter-info">
+                    <div class="presenter-name">{{ settings.presenter_name }}</div>
+                    <div class="presenter-status">Authorized Presenter</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Presentation Stage -->
+        <main class="main-wrapper">
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>Interactive Presentation Controller</h1>
+                    <p>Control slides hands-free using AI Computer Vision & Hand Gestures</p>
+                </div>
+                <div class="header-right" style="display: flex; align-items: center; gap: 10px;">
+                    <button type="button" class="btn btn-primary" id="openUploadModalBtn" style="padding: 8px 16px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; border-radius: var(--radius-sm);" title="Upload your custom PowerPoint or PDF Presentation">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload PPT / PDF
+                    </button>
+                    <button type="button" class="btn" id="headerResetDeckBtn" style="display: none; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; padding: 8px 14px; font-size: 12px; border-radius: var(--radius-sm); cursor: pointer;" title="Reset back to default AI slides">
+                        <i class="fa-solid fa-rotate-left"></i> AI Deck
+                    </button>
+                    <div class="badge-live" id="presStatusBadge">
+                        <div class="pulse-dot"></div>
+                        <span id="presStatusLabel">Live Control Ready</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Presentation Workspace Area -->
+            <div class="presentation-workspace" id="presentationContainer">
+                <div id="presFaceWarningBanner" style="display: none; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: var(--radius-sm); padding: 10px 18px; margin-bottom: 12px; font-size: 13px; color: #FCD34D; align-items: center; justify-content: space-between;">
+                    <span><i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i> Presenter face is not registered yet! Hand gestures are disabled until registered.</span>
+                    <a href="/dashboard" class="btn-sm-register" style="text-decoration: none; padding: 6px 14px; font-size: 12px;"><i class="fa-solid fa-camera"></i> Register Face</a>
+                </div>
+
+                <!-- Stage Container with Slide Viewport -->
+                <div class="presentation-stage-container" id="stageContainer">
+
+                    <!-- Slide Viewport (16:9) with Dynamic Zoom Container -->
+                    <div class="slide-viewport" id="slideViewport">
+
+                        <!-- Optical Laser Pointer Reticle (Follows Index Finger) -->
+                        <div class="laser-pointer-dot" id="laserPointerDot"></div>
+
+                        <!-- Dynamic Slide Content Area (Populated by presentation.js) -->
+                        <div id="slideContent">
+                            <!-- Default Slide 1 Rendering -->
+                            <div class="slide-header">
+                                <div>
+                                    <span class="slide-badge">AI & Computer Vision</span>
+                                    <h2 class="slide-title">AI-Based Authorized Gesture Controlled Presentation System
+                                    </h2>
+                                    <p class="slide-subtitle">Next-Generation Touchless Human-Computer Interaction</p>
+                                </div>
+                            </div>
+                            <div class="slide-body">
+                                <div class="hero-highlights">
+                                    <div class="hero-highlight-item">
+                                        <i class="fa-solid fa-shield-halved"></i>
+                                        <span>Real-time Facial Biometric Authorization</span>
+                                    </div>
+                                    <div class="hero-highlight-item">
+                                        <i class="fa-solid fa-hand"></i>
+                                        <span>Multi-gesture MediaPipe 3D Hand Tracking</span>
+                                    </div>
+                                    <div class="hero-highlight-item">
+                                        <i class="fa-solid fa-microphone"></i>
+                                        <span>Bilingual AI Voice Control (English & தமிழ்)</span>
+                                    </div>
+                                    <div class="hero-highlight-item">
+                                        <i class="fa-solid fa-bolt"></i>
+                                        <span>Sub-50ms Low-Latency Touchless Slide Control</span>
+                                    </div>
+                                    <div class="hero-highlight-item">
+                                        <i class="fa-solid fa-crosshairs"></i>
+                                        <span>Optical Laser Pointer & Pinch-to-Zoom</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slide-footer">
+                                <span>Presenter: <strong style="color: #fff;">{{ settings.presenter_name
+                                        }}</strong></span>
+                                <span class="slide-meta-tag">Slide 1 of 6</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Floating Cyber Voice Control HUD (Clickable to Toggle) -->
+                    <div class="voice-command-hud voice-hud-idle" id="voiceCommandHud" title="Click to Start Voice Control (or press 'V')">
+                        <div class="voice-waves" id="voiceWaves">
+                            <span class="vbar"></span>
+                            <span class="vbar"></span>
+                            <span class="vbar"></span>
+                            <span class="vbar"></span>
+                        </div>
+                        <span class="voice-hud-text" id="voiceHudText">🎤 Voice Control: Click to Start (or press 'V')</span>
+                        <span class="voice-hud-badge" id="voiceHudBadge"><i class="fa-solid fa-microphone-slash"></i> Voice OFF</span>
+                    </div>
+
+                    <!-- Docked PIP Webcam Preview of Presenter -->
+                    <div class="pip-webcam-dock" id="pipWebcamDock">
+                        <img id="pipWebcamImg" src="{{ url_for('gesture_feed') }}" alt="Presenter Camera">
+                        <div class="pip-hud-tag">
+                            <i class="fa-solid fa-hand"></i> <span id="pipGestureTag">Active</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Floating Presentation Control Bar -->
+                <div class="presentation-toolbar">
+                    <div class="toolbar-left">
+                        <button class="tool-btn" id="prevSlideBtn" title="Previous Slide (👎 Thumb Down / 🗣️ 'Back')">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <span class="slide-counter" id="slideCounterDisplay">Slide 1 of 6</span>
+                        <button class="tool-btn" id="nextSlideBtn" title="Next Slide (👍 Thumb Up / 🗣️ 'Next')">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="toolbar-center">
+                        <button class="tool-btn" id="playPauseBtn"
+                            title="Play / Pause Presentation (✋ Open Palm / ✊ Fist / 🗣️ 'Play')">
+                            <i class="fa-solid fa-play" id="playPauseIcon"></i>
+                        </button>
+                        <button class="tool-btn" id="pointerToggleBtn" title="Laser Pointer Mode (☝️ Index Finger / 🗣️ 'Pointer')">
+                            <i class="fa-solid fa-arrow-pointer"></i>
+                        </button>
+                        <button class="tool-btn" id="resetSlideBtn" title="Reset to First Slide (🗣️ 'Reset')">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                        
+                        <!-- Voice Control Trigger Button & Language Toggle -->
+                        <button class="tool-btn voice-toggle-btn" id="voiceControlBtn" title="Toggle Voice Control (Hotkey: V)">
+                            <i class="fa-solid fa-microphone-slash" id="voiceMicIcon"></i>
+                        </button>
+                        <button class="tool-btn" id="voiceLangToggleBtn" title="Switch Voice Language (English / தமிழ்)" style="display: inline-flex; align-items: center; justify-content: center; width: auto; min-width: 44px; padding: 0 10px; font-size: 11px; font-weight: 700; border-radius: 20px; color: var(--secondary);">
+                            <span id="voiceLangLabel">EN</span>
+                        </button>
+                        <button class="tool-btn" id="voiceHelpBtn" title="Voice Commands Guide">
+                            <i class="fa-solid fa-circle-question"></i>
+                        </button>
+                        <button class="tool-btn" id="toolbarUploadBtn" title="Upload Custom PPTX / PDF Presentation">
+                            <i class="fa-solid fa-file-powerpoint"></i>
+                        </button>
+                    </div>
+
+                    <div class="toolbar-right">
+                        <button class="tool-btn" id="zoomOutBtn" title="Zoom Out (🗣️ 'Zoom Out')">
+                            <i class="fa-solid fa-magnifying-glass-minus"></i>
+                        </button>
+                        <span class="zoom-indicator" id="zoomIndicator">1.0x</span>
+                        <button class="tool-btn" id="zoomInBtn" title="Zoom In (🤏 Pinch / 🗣️ 'Zoom In')">
+                            <i class="fa-solid fa-magnifying-glass-plus"></i>
+                        </button>
+                        <button class="tool-btn" id="fullscreenBtn" title="Toggle Fullscreen (🗣️ 'Fullscreen')">
+                            <i class="fa-solid fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Voice Commands Help Modal -->
+            <div class="modal-overlay" id="voiceHelpModal" style="display: none;">
+                <div class="modal-box voice-modal-box">
+                    <div class="modal-header">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="voice-modal-icon">
+                                <i class="fa-solid fa-microphone-lines"></i>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 17px; color: #fff;">AI Voice Control Assistant</h3>
+                                <p style="margin: 0; font-size: 12px; color: var(--secondary);">Touchless Speech Commands (English & Tamil)</p>
+                            </div>
+                        </div>
+                        <button type="button" class="modal-close-btn" id="closeVoiceModalBtn">&times;</button>
+                    </div>
+                    <div class="modal-body" style="padding: 20px;">
+                        <div class="voice-commands-grid">
+                            <!-- Category 1: Navigation -->
+                            <div class="voice-cmd-card">
+                                <h4><i class="fa-solid fa-arrows-split-up-and-left"></i> Slide Navigation</h4>
+                                <ul class="voice-cmd-list">
+                                    <li><code>"Next"</code> / <code>"Next Slide"</code> / <code>"Adutha Slide"</code> <span class="cmd-desc">Next slide</span></li>
+                                    <li><code>"Back"</code> / <code>"Previous Slide"</code> / <code>"Pinnadi"</code> <span class="cmd-desc">Previous slide</span></li>
+                                    <li><code>"Slide 1"</code> to <code>"Slide 6"</code> <span class="cmd-desc">Jump to slide number</span></li>
+                                    <li><code>"First Slide"</code> / <code>"Last Slide"</code> <span class="cmd-desc">Go to start / end</span></li>
+                                </ul>
+                            </div>
+
+                            <!-- Category 2: Playback -->
+                            <div class="voice-cmd-card">
+                                <h4><i class="fa-solid fa-play"></i> Presentation Control</h4>
+                                <ul class="voice-cmd-list">
+                                    <li><code>"Start"</code> / <code>"Play"</code> / <code>"Aarambi"</code> <span class="cmd-desc">Start playback</span></li>
+                                    <li><code>"Pause"</code> / <code>"Stop"</code> / <code>"Nirutthu"</code> <span class="cmd-desc">Pause / hold</span></li>
+                                    <li><code>"Reset"</code> / <code>"Restart"</code> <span class="cmd-desc">Reset to slide 1</span></li>
+                                </ul>
+                            </div>
+
+                            <!-- Category 3: Display -->
+                            <div class="voice-cmd-card">
+                                <h4><i class="fa-solid fa-magnifying-glass"></i> View & Pointer</h4>
+                                <ul class="voice-cmd-list">
+                                    <li><code>"Zoom In"</code> / <code>"Zoom Out"</code> <span class="cmd-desc">Adjust viewport scale</span></li>
+                                    <li><code>"Reset Zoom"</code> / <code>"Normal View"</code> <span class="cmd-desc">Reset zoom to 1.0x</span></li>
+                                    <li><code>"Laser Pointer"</code> / <code>"Pointer"</code> <span class="cmd-desc">Toggle laser reticle</span></li>
+                                    <li><code>"Fullscreen"</code> / <code>"Exit Fullscreen"</code> <span class="cmd-desc">Toggle full display</span></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="voice-tip-box">
+                            <i class="fa-solid fa-lightbulb" style="color: #FBBF24;"></i>
+                            <span><strong>Pro Tip:</strong> Keyboard shortcut <strong>'V'</strong> toggles the microphone immediately while presenting!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload PPT / PDF Presentation Modal -->
+            <div class="modal-overlay" id="uploadPresentationModal" style="display: none;">
+                <div class="modal-box ppt-upload-modal-box" style="max-width: 560px;">
+                    <div class="modal-header">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="modal-header-icon" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B; width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 19px;">
+                                <i class="fa-solid fa-file-powerpoint"></i>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 18px; color: #fff;">Upload Presentation</h3>
+                                <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Present your own slides with AI Hand Gestures & Voice</p>
+                            </div>
+                        </div>
+                        <button type="button" class="modal-close-btn" id="closeUploadModalBtn">&times;</button>
+                    </div>
+
+                    <div class="modal-body" style="padding: 24px 22px;">
+                        <div class="drop-zone" id="pptDropZone" style="border: 2px dashed rgba(56, 189, 248, 0.45); border-radius: 16px; padding: 36px 20px; text-align: center; background: rgba(15, 23, 42, 0.6); cursor: pointer; transition: all 0.25s ease;">
+                            <input type="file" id="pptFileInput" accept=".pptx,.ppt,.pdf,.png,.jpg,.jpeg" style="display: none;">
+                            <div style="font-size: 44px; color: var(--secondary); margin-bottom: 12px;">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                            </div>
+                            <h4 style="margin: 0 0 6px; color: #fff; font-size: 16px; font-weight: 600;">Drag & Drop your Presentation File here</h4>
+                            <p style="margin: 0 0 18px; font-size: 13px; color: var(--text-muted);">Supports PowerPoint (.pptx, .ppt), PDF (.pdf), or Image Slides (.png, .jpg)</p>
+                            <button type="button" class="btn btn-primary" id="browsePptFileBtn" style="padding: 9px 24px; font-size: 13px; border-radius: 25px;">
+                                <i class="fa-solid fa-folder-open"></i> Choose File
+                            </button>
+                        </div>
+
+                        <!-- Upload Progress / Status UI -->
+                        <div id="uploadStatusBox" style="display: none; margin-top: 18px; padding: 14px 18px; border-radius: var(--radius-sm); font-size: 13px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3);">
+                            <div style="display: flex; align-items: center; gap: 12px;" id="uploadStatusText">
+                                <i class="fa-solid fa-spinner fa-spin" style="color: var(--secondary); font-size: 18px;"></i>
+                                <span style="color: #fff; font-weight: 500;">Converting slides for AI presentation...</span>
+                            </div>
+                        </div>
+
+                        <!-- Quick Format Badges -->
+                        <div style="margin-top: 20px; display: flex; gap: 8px; flex-wrap: wrap;">
+                            <span style="font-size: 11px; padding: 5px 12px; background: rgba(234, 88, 12, 0.15); color: #FB923C; border: 1px solid rgba(234, 88, 12, 0.3); border-radius: 20px; font-weight: 600;"><i class="fa-solid fa-file-powerpoint"></i> PowerPoint (.pptx, .ppt)</span>
+                            <span style="font-size: 11px; padding: 5px 12px; background: rgba(239, 68, 68, 0.15); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 20px; font-weight: 600;"><i class="fa-solid fa-file-pdf"></i> PDF Document (.pdf)</span>
+                            <span style="font-size: 11px; padding: 5px 12px; background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 20px; font-weight: 600;"><i class="fa-solid fa-file-image"></i> Slide Images (.png, .jpg)</span>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer" style="padding: 16px 22px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2);">
+                        <button type="button" class="btn" id="resetToDefaultDeckBtn" style="background: rgba(255, 255, 255, 0.06); color: var(--text-muted); border: 1px solid rgba(255, 255, 255, 0.12); font-size: 12px; padding: 7px 16px; border-radius: var(--radius-sm); cursor: pointer;">
+                            <i class="fa-solid fa-rotate-left"></i> Revert to Default AI Deck
+                        </button>
+                        <span style="font-size: 11px; color: var(--text-muted);"><i class="fa-solid fa-shield-check"></i> Processed securely</span>
+                    </div>
+                </div>
+            </div>
+
+            <footer>
+                © 2026 AI-Based Authorized Gesture Controlled Presentation System. All Rights Reserved.
+            </footer>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/presentation.js') }}"></script>
+</body>
+
+</html>

@@ -218,3 +218,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# AI Presentation System Specifics
+# User uploaded slide presentations
+backend/static/uploads/slides/*
+!backend/static/uploads/slides/.gitkeep
+
+# Biometric face models and captured user face data
+backend/registered_face.yml
+backend/static/registered_face.jpg
+
+# VS Code settings
+.vscode/

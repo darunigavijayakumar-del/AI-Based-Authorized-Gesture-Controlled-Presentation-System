@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Presentation System - Face Authentication Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="login-page">
+
+    <!-- Ambient glowing backgrounds for cyber depth -->
+    <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
+
+    <div class="login-portal-card">
+
+        <!-- =========================================
+             LEFT PANEL: Live Camera & Biometric Reticle
+        ========================================= -->
+        <div class="portal-scanner-column">
+            <div class="scanner-header-badge">
+                <span class="live-dot"></span>
+                <span>BIOMETRIC SCANNER ACTIVE</span>
+            </div>
+
+            <!-- Live Camera Feed Box with Biometric Scanning Reticle -->
+            <div class="camera-auth-box">
+                <img id="authWebcamFeed" src="{{ url_for('auth_feed') }}" alt="Live Camera Preview">
+                
+                <!-- Cyber Reticle Elements -->
+                <div class="cyber-reticle">
+                    <div class="corner-bracket tl"></div>
+                    <div class="corner-bracket tr"></div>
+                    <div class="corner-bracket bl"></div>
+                    <div class="corner-bracket br"></div>
+                    <div class="face-target-oval"></div>
+                    <div class="laser-scanner-line"></div>
+                </div>
+
+                <!-- HUD Info Overlay -->
+                <div class="auth-scanning-overlay">
+                    <div class="scan-hud-top">
+                        <span class="hud-pill"><i class="fa-solid fa-video"></i> 30 FPS Live</span>
+                        <span class="hud-pill" id="scanModeLabel"><i class="fa-solid fa-fingerprint"></i> Biometric HUD</span>
+                    </div>
+                    <div class="scan-hud-bottom">
+                        <span id="confBadge" class="hud-pill badge-conf">
+                            <i class="fa-solid fa-chart-simple"></i> Match: --%
+                        </span>
+                        <span class="hud-pill badge-sec">
+                            <i class="fa-solid fa-lock"></i> Secured
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Face Authentication Status Indicator Bar -->
+            <div class="auth-status-bar" id="authStatusBar">
+                <i class="fa-solid fa-spinner fa-spin" id="authStatusIcon"></i>
+                <span id="authStatusText">Initializing Biometric Scanner...</span>
+            </div>
+        </div>
+
+        <!-- =========================================
+             RIGHT PANEL: Identity & Access Controls
+        ========================================= -->
+        <div class="portal-form-column">
+            <!-- Brand Header -->
+            <div class="portal-brand">
+                <div class="brand-logo-icon">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div>
+                    <h2>AI Presentation</h2>
+                    <p>Smart Biometric & Gesture Control</p>
+                </div>
+            </div>
+
+            <!-- Presenter Profile Card / Form -->
+            <form id="loginForm" autocomplete="off" onsubmit="return false;" class="portal-login-form">
+                
+                <div class="login-input-wrapper">
+                    <label for="presenterNameInput" class="login-input-label">
+                        <i class="fa-solid fa-user-tag"></i> Presenter Name
+                    </label>
+                    <div class="login-input-box">
+                        <i class="fa-solid fa-user-tie input-icon"></i>
+                        <input type="text" id="presenterNameInput" name="presenter_name"
+                               placeholder="Enter your name (e.g. boomi, Darun)..." 
+                               value="{{ settings.presenter_name }}" 
+                               autocomplete="off" required autofocus>
+                        <button type="button" id="clearNameBtn" title="Clear name">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </button>
+                    </div>
+                    <div class="profile-info-row">
+                        <span>Authorized for: <strong style="color: #fff;" id="presenterNameDisplay">{{ settings.presenter_name }}</strong></span>
+                        <span id="enrollmentStatus" class="enroll-badge"><i class="fa-solid fa-shield"></i> Enrolled</span>
+                    </div>
+                </div>
+
+                <!-- Registration & Action Controls -->
+                <div class="action-buttons-group">
+                    <!-- Face Registration Button -->
+                    <button type="button" id="registerFaceBtn" class="btn-register">
+                        <i class="fa-solid fa-camera"></i> Instant Face Scan & Enroll
+                    </button>
+
+                    <!-- Login / Enter Dashboard Button -->
+                    <button type="submit" id="loginBtn" class="btn-login">
+                        <span>Enter Presentation Dashboard</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Secondary Utilities -->
+                <div class="portal-utilities">
+                    <a href="javascript:void(0)" id="bypassVerifyBtn" class="util-link quick-verify" title="Instant Access without face requirement">
+                        <i class="fa-solid fa-bolt"></i> Quick Login (Demo)
+                    </a>
+                    <a href="javascript:void(0)" id="resetFaceBtn" class="util-link reset-link" title="Clear registered face profile">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Profile
+                    </a>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>

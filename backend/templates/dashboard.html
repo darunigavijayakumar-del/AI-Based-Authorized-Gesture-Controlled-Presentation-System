@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Presentation System - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- Fixed Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="logo-text">
+                    <h2>AI Presentation</h2>
+                    <span>System</span>
+                </div>
+            </div>
+
+            <ul class="menu">
+                <a href="/dashboard">
+                    <li class="active">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Dashboard</span>
+                    </li>
+                </a>
+                <a href="/gesture">
+                    <li>
+                        <i class="fa-solid fa-hand"></i>
+                        <span>Gesture Module</span>
+                    </li>
+                </a>
+                <a href="/presentation">
+                    <li>
+                        <i class="fa-solid fa-display"></i>
+                        <span>Presentation</span>
+                    </li>
+                </a>
+                <a href="/history">
+                    <li>
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>History</span>
+                    </li>
+                </a>
+                <a href="/settings">
+                    <li>
+                        <i class="fa-solid fa-gear"></i>
+                        <span>Settings</span>
+                    </li>
+                </a>
+            </ul>
+
+            <div class="sidebar-presenter">
+                <div class="presenter-avatar">
+                    {{ settings.presenter_name[0] if settings.presenter_name else 'P' }}
+                </div>
+                <div class="presenter-info">
+                    <div class="presenter-name">{{ settings.presenter_name }}</div>
+                    <div class="presenter-status">Authorized Presenter</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-wrapper">
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>AI-Based Authorized Gesture Controlled Presentation System</h1>
+                    <p>Welcome back, <span id="dashboardPresenterName" style="color: #fff; font-weight: 600;">{{ settings.presenter_name }}</span>. Real-time gesture and presenter authorization is active.</p>
+                </div>
+                <div class="header-right">
+                    <div class="badge-live">
+                        <div class="pulse-dot"></div>
+                        <span>System Online</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Top Row 3 Cards -->
+            <div class="dashboard-grid-top">
+                <!-- A. Live Camera Feed Card -->
+                <div class="card camera-card">
+                    <div class="camera-card-header">
+                        <h2>Live Camera Feed</h2>
+                        <span class="badge-live" style="font-size: 11px; padding: 4px 10px;">
+                            <span class="pulse-dot"></span> Camera Connected
+                        </span>
+                    </div>
+                    <div class="camera-stream-wrapper">
+                        <img id="dashboardCameraFeed" src="{{ url_for('video_feed') }}" alt="Live Webcam Feed">
+                        <div class="camera-hud-badge">
+                            <i class="fa-solid fa-video"></i> 640x480 @ 30 FPS
+                        </div>
+                    </div>
+                    <div id="dashboardAuthBanner" class="verified-banner" style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                            <i class="fa-solid fa-circle-check" id="authBannerIcon"></i>
+                            <div>
+                                <h3 id="authBannerTitle">Face Biometric Status</h3>
+                                <p id="authBannerSubtitle">Checking authorization...</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-sm-register" id="quickRegisterFaceBtn">
+                            <i class="fa-solid fa-camera"></i> Register Face
+                        </button>
+                    </div>
+                </div>
+
+                <!-- B. System Status Card -->
+                <div class="card status-card">
+                    <h2>System Status</h2>
+                    <div class="status-list">
+                        <div class="status-row">
+                            <span class="status-label">
+                                <i class="fa-solid fa-user-shield"></i> Face Authentication
+                            </span>
+                            <span class="status-pill success" id="statusFace">Verified</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">
+                                <i class="fa-solid fa-camera"></i> Camera Status
+                            </span>
+                            <span class="status-pill success" id="statusCam">Connected</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">
+                                <i class="fa-solid fa-hand-wave"></i> Gesture Recognition
+                            </span>
+                            <span class="status-pill success" id="statusGesture">Active</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">
+                                <i class="fa-solid fa-chalkboard"></i> Presentation Control
+                            </span>
+                            <span class="status-pill primary" id="statusPres">Ready</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">
+                                <i class="fa-solid fa-microphone-lines"></i> AI Voice Control
+                            </span>
+                            <span class="status-pill success" id="statusVoice">Bilingual Ready</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- C. Quick Actions Card -->
+                <div class="card actions-card">
+                    <h2>Quick Actions</h2>
+                    <div class="actions-btn-group">
+                        <a href="/gesture" class="action-btn-item">
+                            <div>
+                                <i class="fa-solid fa-hand action-icon"></i>
+                                <span>Gesture Module</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                        <a href="/presentation" class="action-btn-item">
+                            <div>
+                                <i class="fa-solid fa-play action-icon"></i>
+                                <span>Start Presentation</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                        <a href="/history" class="action-btn-item">
+                            <div>
+                                <i class="fa-solid fa-clock-rotate-left action-icon"></i>
+                                <span>View History</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                        <a href="/settings" class="action-btn-item">
+                            <div>
+                                <i class="fa-solid fa-gear action-icon"></i>
+                                <span>Settings</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Row 2 Cards -->
+            <div class="dashboard-grid-bottom">
+                <!-- D. Supported Gestures -->
+                <div class="card gestures-card">
+                    <h2>Supported Gestures</h2>
+                    <div class="gestures-grid">
+                        <div class="gesture-card-item">
+                            <div class="gesture-emoji">👍</div>
+                            <div class="gesture-title">Thumb Up</div>
+                            <div class="gesture-desc">Next Slide</div>
+                        </div>
+                        <div class="gesture-card-item">
+                            <div class="gesture-emoji">👎</div>
+                            <div class="gesture-title">Thumb Down</div>
+                            <div class="gesture-desc">Previous Slide</div>
+                        </div>
+                        <div class="gesture-card-item">
+                            <div class="gesture-emoji">✋</div>
+                            <div class="gesture-title">Open Palm</div>
+                            <div class="gesture-desc">Start Presentation</div>
+                        </div>
+                        <div class="gesture-card-item">
+                            <div class="gesture-emoji">✊</div>
+                            <div class="gesture-title">Closed Fist</div>
+                            <div class="gesture-desc">Pause / Hold</div>
+                        </div>
+                        <div class="gesture-card-item">
+                            <div class="gesture-emoji">☝️</div>
+                            <div class="gesture-title">Index Finger</div>
+                            <div class="gesture-desc">Pointer Mode</div>
+                        </div>
+                        <div class="gesture-card-item">
+                            <div class="gesture-emoji">🤏</div>
+                            <div class="gesture-title">Pinch Gesture</div>
+                            <div class="gesture-desc">Zoom In / Out</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- E. Recent Activity -->
+                <div class="card activity-card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                        <h2 style="margin: 0;">Recent Activity</h2>
+                        <a href="/history"
+                            style="font-size: 12px; color: var(--secondary); text-decoration: none; font-weight: 600;">View
+                            All</a>
+                    </div>
+                    <ul class="activity-timeline" id="recentActivityList">
+                        <li class="activity-item">
+                            <i class="fa-solid fa-circle-check" style="color: var(--success);"></i>
+                            <span>Face authentication successful</span>
+                            <span class="time-ago">Just now</span>
+                        </li>
+                        <li class="activity-item">
+                            <i class="fa-solid fa-hand" style="color: var(--secondary);"></i>
+                            <span>Gesture module activated</span>
+                            <span class="time-ago">1m ago</span>
+                        </li>
+                        <li class="activity-item">
+                            <i class="fa-solid fa-play" style="color: #A78BFA;"></i>
+                            <span>Presentation control initialized</span>
+                            <span class="time-ago">2m ago</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Biometric Face Enrollment Modal -->
+            <div class="modal-overlay" id="faceRegisterModal">
+                <div class="modal-box">
+                    <div class="modal-header">
+                        <h3><i class="fa-solid fa-user-shield" style="color: var(--secondary);"></i> Biometric Face Registration</h3>
+                        <button type="button" class="modal-close-btn" id="closeFaceModalBtn">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
+                            Position your face directly in the camera frame in good lighting. The system will enroll your facial profile so that <strong>only your hand gestures</strong> can control the presentation.
+                        </p>
+                        <div class="form-field" style="margin-bottom: 0;">
+                            <label for="modalPresenterNameInput">Presenter Name</label>
+                            <input type="text" id="modalPresenterNameInput" class="form-input"
+                                   value="{{ settings.presenter_name }}" placeholder="Enter presenter name...">
+                        </div>
+                        <div class="modal-cam-preview">
+                            <img id="modalCamFeed" src="" data-src="{{ url_for('auth_feed') }}" alt="Camera Registration Preview">
+                        </div>
+                        <div class="scan-progress-wrapper" id="scanProgressWrapper">
+                            <div class="scan-progress-bar">
+                                <div class="scan-progress-fill" id="scanProgressFill"></div>
+                            </div>
+                            <div class="scan-status-msg" id="scanStatusMsg">
+                                <i class="fa-solid fa-spinner fa-spin"></i> <span>Scanning face samples...</span>
+                            </div>
+                        </div>
+                        <button type="button" id="startModalRegisterBtn" class="btn btn-primary" style="width: 100%; padding: 14px;">
+                            <i class="fa-solid fa-camera-retro"></i> Capture & Register Face Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <footer>
+                © 2026 AI-Based Authorized Gesture Controlled Presentation System. All Rights Reserved.
+            </footer>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+
+</html>
